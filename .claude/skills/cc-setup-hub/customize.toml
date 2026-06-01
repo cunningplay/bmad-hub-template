@@ -1,6 +1,6 @@
-# Customization surface for bmad-setup-hub.
-# Override these in _bmad/custom/bmad-setup-hub.toml (team) or
-# _bmad/custom/bmad-setup-hub.user.toml (personal).
+# Customization surface for cc-setup-hub.
+# Override these in _bmad/custom/cc-setup-hub.toml (team) or
+# _bmad/custom/cc-setup-hub.user.toml (personal).
 
 [workflow]
 

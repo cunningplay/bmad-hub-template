@@ -8,17 +8,17 @@ The hub is a single planning repo that owns all docs, epics, stories, and sessio
 
 ## Quickstart
 
-### Option A — Claude skill (recommended)
+### Option A — Claude Code skill (recommended)
 
 Open Claude Code in any directory and run:
 
 ```
-/bmad-setup-hub
+/cc-setup-hub
 ```
 
 Claude asks for your project name, architecture preset, and repo names, then generates all files directly — no terminal, no platform issues, works identically on Mac, Linux, and Windows.
 
-The skill is in `.claude/skills/bmad-setup-hub/`. Install it by copying that directory into your Claude Code skills folder, or via the BMad installer.
+The skill is in `.claude/skills/cc-setup-hub/`. Install it by copying that directory into your Claude Code skills folder, or via the BMad installer.
 
 ### Option B — Script (no Claude required)
 
@@ -41,6 +41,12 @@ cd bmad-hub-template
 > If PowerShell blocks the script, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, then retry.
 
 Both scripts ask the same questions and produce identical output to the skill.
+
+## Skill compatibility
+
+> **Note:** The skills in this template (`.claude/skills/`) are currently **Claude Code only**. They use Claude Code's Write and Bash tools to generate files directly — they will not work in other Claude interfaces (claude.ai, API, etc.) or other AI coding tools.
+>
+> BMad itself is platform-agnostic. If you're running BMad in a different environment, use the shell scripts (`setup.sh` / `setup.ps1`) instead.
 
 ## Architecture presets
 

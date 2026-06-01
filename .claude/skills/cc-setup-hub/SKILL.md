@@ -1,6 +1,6 @@
 ---
-name: bmad-setup-hub
-description: Scaffold a new BMad project hub interactively. Asks for project name, architecture preset, and repo names — then generates all session files, hub CLAUDE.md, and per-repo CLAUDE.md files. Use when the user says "setup hub", "new project", or "create hub".
+name: cc-setup-hub
+description: Scaffold a new BMad project hub interactively using Claude Code file tools. Asks for project name, architecture preset, and repo names — then generates all session files, hub CLAUDE.md, and per-repo CLAUDE.md files. Use when the user says "setup hub", "new project", or "create hub". Requires Claude Code.
 ---
 
 # BMad Hub Setup Skill
