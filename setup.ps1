@@ -58,9 +58,12 @@ Write-Host "  2) API + Web         - planning, backend, web, qa"
 Write-Host "  3) API + Mobile      - planning, backend, ios, android, qa"
 Write-Host "  4) API + iOS only    - planning, backend, ios, qa"
 Write-Host "  5) Full stack        - planning, backend, web, ios, android, qa"
-Write-Host "  6) Custom            - choose individual sessions"
+Write-Host "  6) iOS only          - planning, ios, qa"
+Write-Host "  7) Android only      - planning, android, qa"
+Write-Host "  8) Mobile only       - planning, ios, android, qa"
+Write-Host "  9) Custom            - choose individual sessions"
 Write-Host ""
-$Preset = Read-Host "Choice [1-6]"
+$Preset = Read-Host "Choice [1-9]"
 
 $Sessions = [System.Collections.Generic.List[string]]@("planning", "qa")
 
@@ -70,7 +73,10 @@ switch ($Preset) {
     "3" { $Sessions.AddRange(@("backend", "ios", "android")) }
     "4" { $Sessions.AddRange(@("backend", "ios")) }
     "5" { $Sessions.AddRange(@("backend", "web", "ios", "android")) }
-    "6" {
+    "6" { $Sessions.AddRange(@("ios")) }
+    "7" { $Sessions.AddRange(@("android")) }
+    "8" { $Sessions.AddRange(@("ios", "android")) }
+    "9" {
         Write-Host ""
         Write-Host "Select sessions (y/n for each):" -ForegroundColor Cyan
         foreach ($s in @("backend", "web", "ios", "android", "cli")) {

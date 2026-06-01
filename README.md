@@ -58,13 +58,17 @@ The shell scripts (`setup.sh` / `setup.ps1`) are an alternative if you prefer no
 
 ## Architecture presets
 
-| Preset | Sessions | Use when |
-|--------|----------|----------|
-| `web-only` | planning, web, qa | Frontend + serverless / third-party backend |
-| `api-web` | planning, backend, web, qa | Separate API + web frontend (most SaaS) |
-| `api-mobile` | planning, backend, ios, [android], qa | API + native mobile app(s) |
-| `full-stack` | planning, backend, web, ios, android, qa | API + web companion + native mobile |
-| `custom` | you choose | Any other combination |
+| # | Preset | Sessions | Use when |
+|---|--------|----------|----------|
+| 1 | `web-only` | planning, web, qa | Frontend + serverless / third-party backend |
+| 2 | `api-web` | planning, backend, web, qa | Separate API + web frontend (most SaaS) |
+| 3 | `api-mobile` | planning, backend, ios, android, qa | API + native mobile (both platforms) |
+| 4 | `api-ios` | planning, backend, ios, qa | API + iOS only |
+| 5 | `full-stack` | planning, backend, web, ios, android, qa | API + web companion + native mobile |
+| 6 | `ios-only` | planning, ios, qa | iOS app with third-party backend (Firebase, Supabase, etc.) |
+| 7 | `android-only` | planning, android, qa | Android app with third-party backend |
+| 8 | `mobile-only` | planning, ios, android, qa | iOS + Android with third-party backend |
+| 9 | `custom` | you choose | Any other combination |
 
 See [examples/](examples/) for sample session files for each preset.
 

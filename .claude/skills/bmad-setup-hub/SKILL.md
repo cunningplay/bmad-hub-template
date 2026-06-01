@@ -87,10 +87,13 @@ Present the following options clearly:
 |---|--------|-----------------|----------|
 | 1 | **Web only** | planning, web, qa | Frontend with serverless / third-party backend |
 | 2 | **API + Web** | planning, backend, web, qa | Separate API server + web frontend |
-| 3 | **API + iOS** | planning, backend, ios, qa | API + iOS native app only |
-| 4 | **API + Mobile** | planning, backend, ios, android, qa | API + native mobile (both platforms) |
+| 3 | **API + Mobile** | planning, backend, ios, android, qa | API + native mobile (both platforms) |
+| 4 | **API + iOS only** | planning, backend, ios, qa | API + iOS only |
 | 5 | **Full stack** | planning, backend, web, ios, android, qa | API + web companion + native mobile |
-| 6 | **Custom** | you choose | Any other combination |
+| 6 | **iOS only** | planning, ios, qa | iOS app with third-party backend (Firebase, Supabase, etc.) |
+| 7 | **Android only** | planning, android, qa | Android app with third-party backend |
+| 8 | **Mobile only** | planning, ios, android, qa | iOS + Android with third-party backend |
+| 9 | **Custom** | you choose | Any other combination |
 
 For **Custom**, ask the user to select from: `backend`, `web`, `ios`, `android`, `cli`. Allow multiple selections.
 

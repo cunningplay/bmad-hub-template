@@ -51,9 +51,12 @@ echo "  2) API + Web         — planning, backend, web, qa"
 echo "  3) API + Mobile      — planning, backend, ios, android, qa"
 echo "  4) API + iOS only    — planning, backend, ios, qa"
 echo "  5) Full stack        — planning, backend, web, ios, android, qa"
-echo "  6) Custom            — choose individual sessions"
+echo "  6) iOS only          — planning, ios, qa"
+echo "  7) Android only      — planning, android, qa"
+echo "  8) Mobile only       — planning, ios, android, qa"
+echo "  9) Custom            — choose individual sessions"
 echo
-printf '%s' "$(bold 'Choice') [1-6]: "
+printf '%s' "$(bold 'Choice') [1-9]: "
 read -r PRESET
 
 SESSIONS=("planning" "qa")  # always included
@@ -64,7 +67,10 @@ case "$PRESET" in
   3) SESSIONS+=("backend" "ios" "android") ;;
   4) SESSIONS+=("backend" "ios") ;;
   5) SESSIONS+=("backend" "web" "ios" "android") ;;
-  6)
+  6) SESSIONS+=("ios") ;;
+  7) SESSIONS+=("android") ;;
+  8) SESSIONS+=("ios" "android") ;;
+  9)
     echo
     echo "$(bold 'Select sessions') (y/n for each):"
     for s in backend web ios android cli; do
