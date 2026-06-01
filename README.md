@@ -1,16 +1,53 @@
 # BMad Hub Template
 
-A starting point for BMad method project hubs. Generates the right session files for your architecture via a setup script or a Claude skill.
+A scaffold for setting up a **BMad method project hub** — the central planning repo that coordinates AI-assisted development across multiple code repos and Claude Code sessions.
 
-## What is a hub repo?
+## The problem this solves
 
-The hub is a single planning repo that owns all docs, epics, stories, and session work queues. Code repos (backend, web, iOS, etc.) are separate — they each get a `CLAUDE.md` that points back to the hub's session file.
+When you use Claude Code to build software, each terminal session starts with no memory of what you were doing. If you have multiple repos — a backend, a web frontend, an iOS app — you end up with no consistent way to hand off context between sessions, no shared definition of what's in progress, and no clear answer to "what should I work on next?"
+
+The BMad method solves this with a **hub repo**: a single planning repository that every session reads first. It contains work queues (session files) that tell each Claude session exactly what to do, what's blocked, and what's done. The PM session owns and maintains these files; code sessions consume them.
+
+## How it works
+
+```
+hub repo (this)              code repos
+─────────────────            ────────────────────────────────────
+docs/sessions/               cunningplay-backend/
+  planning-session.md   ←──    CLAUDE.md  (points back to hub)
+  backend-session.md    ←──  cunningplay-web/
+  web-session.md        ←──    CLAUDE.md
+  ios-session.md        ←──  cunningplay-ios/
+  qa-session.md         ←──    CLAUDE.md
+docs/epics/              
+docs/tests/              
+CLAUDE.md               
+```
+
+**Each session file answers one question: "What should I do right now?"**
+
+When you open Claude Code in a code repo, it auto-reads `CLAUDE.md`, which points to the session file in the hub. The session file lists the top priority story, what's blocked, and any open PM questions — no copy-pasting, no context rebuild.
+
+The **PM session** (running in the hub repo) is the only session that updates session files. It triages new work, resolves blockers, and keeps all queues current. Code sessions and the QA session read their file, do the work, and push.
+
+## Sessions
+
+| Session | Persona | Repo | Role |
+|---------|---------|------|------|
+| Planning | `bmad-agent-pm` | hub | Maintains all session files, epics, and test coverage |
+| Backend | `bmad-agent-dev` | backend repo | Implements API stories |
+| Web | `bmad-agent-dev` | web repo | Implements frontend stories |
+| iOS | `bmad-agent-dev` | iOS repo | Implements iOS stories |
+| Android | `bmad-agent-dev` | Android repo | Implements Android stories |
+| QA | `bmad-qa` | cross-repo | Tests completed features against production |
+
+You only create the sessions your project needs — see [Architecture presets](#architecture-presets).
 
 ## Quickstart
 
 ### Option A — BMad skill (recommended)
 
-Open Claude Code (or any Claude interface with BMad installed) and run:
+Open Claude Code in any directory and run:
 
 ```
 /bmad-setup-hub
@@ -25,18 +62,18 @@ The skill is in `.claude/skills/bmad-setup-hub/`. Install it by copying that dir
 
 ### Option B — Script (no Claude required)
 
-Clone the repo, then run the script for your platform:
+Clone this repo, then run the script for your platform:
 
 **macOS / Linux**
 ```bash
-git clone <this-repo>
+git clone https://github.com/cunningplay/bmad-hub-template
 cd bmad-hub-template
 ./setup.sh
 ```
 
 **Windows (PowerShell)**
 ```powershell
-git clone <this-repo>
+git clone https://github.com/cunningplay/bmad-hub-template
 cd bmad-hub-template
 .\setup.ps1
 ```
@@ -45,18 +82,9 @@ cd bmad-hub-template
 
 Both scripts ask the same questions and produce identical output to the skill.
 
-## Skill compatibility
-
-`bmad-setup-hub` is environment-aware — it detects whether file system tools are available and adapts:
-
-| Environment | Skill behaviour |
-|-------------|----------------|
-| Claude Code | Writes files to disk, inits git |
-| claude.ai / API / other | Outputs file contents as copy-paste blocks + shell commands |
-
-The shell scripts (`setup.sh` / `setup.ps1`) are an alternative if you prefer not to use the skill at all.
-
 ## Architecture presets
+
+Choose the preset that matches your project. Sessions not in the preset simply aren't created — you can always add more later with `/bmad-add-session`.
 
 | # | Preset | Sessions | Use when |
 |---|--------|----------|----------|
@@ -86,27 +114,32 @@ my-project-hub/
 │   │   ├── ios-session.md           ← if ios selected
 │   │   ├── android-session.md       ← if android selected
 │   │   └── archive/                 ← completed sprint logs go here
-│   ├── epics/                       ← full story specs
-│   └── tests/                       ← QA test cases
-└── _code-repo-claudes/              ← CLAUDE.md file for each code repo
+│   ├── epics/                       ← full story specs (written by PM session)
+│   └── tests/                       ← QA test cases per epic
+└── _code-repo-claudes/              ← drop each file into the matching code repo
     └── my-project-api-CLAUDE.md     ← copy to my-project-api/CLAUDE.md
 ```
 
-## Templates
+## Adding sessions later
 
-Raw template files live in [templates/](templates/). Each uses `{{PLACEHOLDER}}` tokens. Substituted automatically by `setup.sh` — or edit manually if you prefer.
+If your project grows a new code repo after initial setup, run `/bmad-add-session` from inside the hub:
 
-| Placeholder | Description |
-|-------------|-------------|
-| `{{PROJECT_NAME}}` | e.g. "Ashenmarch" |
-| `{{PROJECT_DESCRIPTION}}` | One-line description |
-| `{{HUB_REPO}}` | Hub repo name |
-| `{{BACKEND_REPO}}` | Backend repo name |
-| `{{WEB_REPO}}` | Web repo name |
-| `{{IOS_REPO}}` | iOS repo name |
-| `{{ANDROID_REPO}}` | Android repo name |
-| `{{ADMIN_EMAIL}}` | QA test admin account |
-| `{{DATE}}` | Populated with today's date |
+```
+/bmad-add-session
+```
+
+It adds the session file, updates the hub `CLAUDE.md` session map, and generates a `CLAUDE.md` for the new code repo.
+
+## Skill compatibility
+
+`bmad-setup-hub` and `bmad-add-session` are environment-aware — they detect whether file system tools are available and adapt:
+
+| Environment | Skill behaviour |
+|-------------|----------------|
+| Claude Code | Writes files to disk, inits git |
+| claude.ai / API / other | Outputs file contents as copy-paste blocks + shell commands |
+
+The shell scripts (`setup.sh` / `setup.ps1`) are an alternative if you prefer not to use the skills at all.
 
 ## After setup
 
@@ -135,3 +168,19 @@ Push the hub repo. If you want this hub to be reusable as a GitHub template for 
 Open Claude Code in the hub directory and invoke `bmad-agent-pm` to begin your first planning session.
 
 **Not sure what to do next?** Type `/bmad-help` at any point — it reads the current project state and recommends the right next skill or action. Use it when you're starting fresh, returning after a break, or unsure which BMad skill applies to your current task.
+
+## Templates
+
+Raw session template files live in [templates/](templates/). Each uses `{{PLACEHOLDER}}` tokens — substituted automatically by the skills and scripts, or edit manually if you prefer.
+
+| Placeholder | Description |
+|-------------|-------------|
+| `{{PROJECT_NAME}}` | e.g. "Ashenmarch" |
+| `{{PROJECT_DESCRIPTION}}` | One-line description |
+| `{{HUB_REPO}}` | Hub repo name |
+| `{{BACKEND_REPO}}` | Backend repo name |
+| `{{WEB_REPO}}` | Web repo name |
+| `{{IOS_REPO}}` | iOS repo name |
+| `{{ANDROID_REPO}}` | Android repo name |
+| `{{ADMIN_EMAIL}}` | QA test admin account |
+| `{{DATE}}` | Populated with today's date |

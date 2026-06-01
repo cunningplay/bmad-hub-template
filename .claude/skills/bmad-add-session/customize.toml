@@ -1,0 +1,15 @@
+# Customization surface for bmad-add-session.
+# Override in _bmad/custom/bmad-add-session.toml (team) or
+# _bmad/custom/bmad-add-session.user.toml (personal).
+
+[workflow]
+
+activation_steps_prepend = []
+activation_steps_append = []
+
+# Persistent facts for the whole run — add org-level constraints here.
+# e.g. "All repos must be in the github.com/acme org."
+persistent_facts = []
+
+# Executed after session files are written and CLAUDE.md is updated.
+on_complete = ""
