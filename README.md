@@ -92,8 +92,28 @@ Raw template files live in [templates/](templates/). Each uses `{{PLACEHOLDER}}`
 
 ## After setup
 
-1. **Install BMad** — run the BMad installer in the hub directory to populate `_bmad/`
-2. **Copy `_code-repo-claudes/` files** — drop each generated `CLAUDE.md` into its code repo root
-3. **Update production URLs** — fill in real URLs in `docs/sessions/qa-session.md`
-4. **Push to GitHub** — enable "Template repository" in settings if you want a reusable template
-5. **Start planning** — open Claude Code in the hub repo, invoke `bmad-agent-pm`
+### 1. Install BMad
+
+BMad is the AI-native development framework that powers the personas, skills, and workflows referenced in every session file. The hub setup creates the session structure — BMad provides the intelligence layer on top.
+
+**Install:** follow the instructions at [bmad-code.github.io](https://bmad-code.github.io) (or your team's internal BMad distribution). Run the installer inside the hub directory — it populates `_bmad/` with scripts, skills, and config.
+
+> Install BMad **before** opening your first planning session. The PM persona (`bmad-agent-pm`) and all `/bmad-*` skills come from BMad, not from this template.
+
+### 2. Copy code repo CLAUDE.md files
+
+Drop each file from `_code-repo-claudes/` into the root of its code repo as `CLAUDE.md`. Claude Code reads this automatically on startup — no kickoff copy-paste needed.
+
+### 3. Update production URLs
+
+Fill in real service URLs in `docs/sessions/qa-session.md`. The generated file has `https://api.example.com` placeholders.
+
+### 4. Push to GitHub
+
+Push the hub repo. If you want this hub to be reusable as a GitHub template for future projects, enable **"Template repository"** in the repo's Settings page.
+
+### 5. Start planning
+
+Open Claude Code in the hub directory and invoke `bmad-agent-pm` to begin your first planning session.
+
+**Not sure what to do next?** Type `/bmad-help` at any point — it reads the current project state and recommends the right next skill or action. Use it when you're starting fresh, returning after a break, or unsure which BMad skill applies to your current task.
