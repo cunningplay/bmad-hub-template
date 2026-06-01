@@ -362,7 +362,13 @@ Sessions in hub:
 **Next steps:**
 1. Fill in real production URLs in `docs/sessions/qa-session.md`
 2. Install BMad in the hub: run the BMad installer in `./{hub-repo-name}/`
-3. Push each repo to GitHub
+3. Push each repo to GitHub — for each repo, create the remote on GitHub then:
+   ```bash
+   cd ./{repo-name}
+   git remote add origin git@github.com:{your-org}/{repo-name}.git
+   git push -u origin main
+   ```
+   Repeat for the hub and every code repo.
 4. Open Claude Code in `./{hub-repo-name}/` and invoke `bmad-agent-pm` to start planning
 
 </step>

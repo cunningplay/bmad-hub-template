@@ -216,8 +216,18 @@ Files created / updated:
 - `docs/sessions/README.md` — session table updated ✓
 
 **Next steps:**
-1. Push `../{repo-name}/` to GitHub as a new repo
-2. Commit the hub repo changes
+1. Create the repo on GitHub, then push the new code repo:
+   ```bash
+   cd ../{repo-name}
+   git remote add origin git@github.com:{your-org}/{repo-name}.git
+   git push -u origin main
+   ```
+2. Commit and push the hub changes:
+   ```bash
+   cd ../{hub-repo}
+   git add -A && git commit -m "add {type} session"
+   git push
+   ```
 3. The PM session will populate `docs/sessions/{type}-session.md` with the first sprint tasks
 
 ---
