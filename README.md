@@ -8,15 +8,27 @@ The hub is a single planning repo that owns all docs, epics, stories, and sessio
 
 ## Quickstart
 
-### Option A — Shell script (no Claude required)
+### Option A — Script (no Claude required)
 
+Clone the repo, then run the script for your platform:
+
+**macOS / Linux**
 ```bash
 git clone <this-repo>
 cd bmad-hub-template
 ./setup.sh
 ```
 
-The script asks for your project name, architecture preset, and repo names — then generates a ready-to-use hub directory and `CLAUDE.md` files for each code repo.
+**Windows (PowerShell)**
+```powershell
+git clone <this-repo>
+cd bmad-hub-template
+.\setup.ps1
+```
+
+> If PowerShell blocks the script, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, then retry.
+
+Both scripts ask the same questions: project name, architecture preset, and repo names — then generate a ready-to-use hub directory and `CLAUDE.md` files for each code repo.
 
 ### Option B — Claude skill (recommended)
 
