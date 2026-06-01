@@ -134,11 +134,9 @@ Wait for answers.
 Show a summary of what will be generated:
 
 ```
-Hub repo:     {hub-repo-name}/
+Hub repo:     {hub-repo-name}/          (created in current directory)
 Sessions:     planning, {selected-sessions}, qa
-Code repos:   {list of repo names}
-Output:       ./{hub-repo-name}/  (created in current directory)
-              ./{hub-repo-name}/_code-repo-claudes/  (CLAUDE.md per code repo)
+Code repos:   {list of repo names}      (sibling directories, each with CLAUDE.md + git init)
 ```
 
 Ask: **"Shall I generate this now?"**
@@ -266,22 +264,40 @@ git commit -m "init: {project-name} hub (BMad session scaffold)"
 
 </step>
 
-<step n="6" goal="Generate code repo CLAUDE.md files">
+<step n="6" goal="Generate code repo directories with CLAUDE.md">
 
 For each selected code session, generate a `CLAUDE.md` using `{skill-root}/../../templates/code-repo-CLAUDE.md` as the base, substituting all placeholders.
 
-**If MODE = direct:** write each file to:
+**If MODE = direct:** create each code repo as a sibling directory alongside the hub, with `CLAUDE.md` inside and an initial git commit:
+
 ```
-{hub-repo-name}/_code-repo-claudes/{repo-name}-CLAUDE.md
+(parent of hub)/
+├── {hub-repo-name}/        ← hub (already created in step 5)
+├── {backend-repo}/
+│   └── CLAUDE.md
+├── {web-repo}/
+│   └── CLAUDE.md
+└── {ios-repo}/
+    └── CLAUDE.md
 ```
 
-**If MODE = guided:** output each as a labelled code block:
+For each code repo:
+1. Create the directory at the same level as the hub
+2. Write `CLAUDE.md` into it
+3. Run `git init && git add CLAUDE.md && git commit -m "init: {project} {session} repo"`
+
+**If MODE = guided:** output each as a labelled code block with the target path shown:
 ````
-### `_code-repo-claudes/{repo-name}-CLAUDE.md`
+### `../{repo-name}/CLAUDE.md`
 ```markdown
 {file contents}
 ```
 ````
+Then list the shell commands to create and init each repo:
+```bash
+mkdir {repo-name} && cd {repo-name}
+git init && git add CLAUDE.md && git commit -m "init: {project} {session} repo"
+```
 
 Platform-specific workflow lines by session type:
 
@@ -333,25 +349,21 @@ Then report to the user:
 
 ---
 
-**Hub created: `./{hub-repo-name}/`**
+**Created:**
+- Hub: `./{hub-repo-name}/`
+- Code repos (sibling directories, each with `CLAUDE.md` + `git init`):
+  - `./{repo-name}/` _(one line per code session)_
 
-Sessions generated:
+Sessions in hub:
 - `planning-session.md`
 - _(one line per selected session)_
 - `qa-session.md`
 
-CLAUDE.md files for your code repos are in `_code-repo-claudes/` — copy each one to the root of its code repo:
-
-| File | Copy to |
-|------|---------|
-| `{repo}-CLAUDE.md` | `{repo}/CLAUDE.md` |
-
 **Next steps:**
 1. Fill in real production URLs in `docs/sessions/qa-session.md`
 2. Install BMad in the hub: run the BMad installer in `./{hub-repo-name}/`
-3. Copy each file from `_code-repo-claudes/` to its code repo as `CLAUDE.md`
-4. Push to GitHub — enable "Template repository" in settings if this hub is a template
-5. Open Claude Code in `./{hub-repo-name}/` and invoke `bmad-agent-pm` to start planning
+3. Push each repo to GitHub
+4. Open Claude Code in `./{hub-repo-name}/` and invoke `bmad-agent-pm` to start planning
 
 </step>
 

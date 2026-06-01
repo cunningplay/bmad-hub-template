@@ -233,10 +233,9 @@ EOF
 # .gitignore
 echo ".DS_Store" > "$OUTPUT_DIR/.gitignore"
 
-# ── Generate code repo CLAUDE.md files ───────────────────────────────────────
+# ── Generate code repo directories with CLAUDE.md ────────────────────────────
 
-CODE_CLAUDE_DIR="$OUTPUT_DIR/_code-repo-claudes"
-mkdir -p "$CODE_CLAUDE_DIR"
+PARENT_DIR="$(dirname "$(cd "$OUTPUT_DIR" && pwd)")"
 
 for session in "${SESSIONS[@]}"; do
   case "$session" in planning|qa) continue ;; esac
@@ -244,6 +243,7 @@ for session in "${SESSIONS[@]}"; do
   repo="${REPOS[$session]}"
   role="${REPO_ROLES[$session]}"
   lint="${LINT_CMDS[$session]:-run your stack's lint + test command}"
+  repo_dir="$PARENT_DIR/$repo"
 
   case "$session" in
     ios)     persona="bmad-agent-dev — Swift / SwiftUI" ;;
@@ -262,7 +262,8 @@ for session in "${SESSIONS[@]}"; do
       ;;
   esac
 
-  cat > "$CODE_CLAUDE_DIR/$repo-CLAUDE.md" << EOF
+  mkdir -p "$repo_dir"
+  cat > "$repo_dir/CLAUDE.md" << EOF
 # $PROJECT_NAME — ${session^} Session
 
 **Session file:** \`../$HUB_REPO/docs/sessions/$session-session.md\` — read this first.
@@ -286,9 +287,15 @@ $((step_num+1)). Add QA test cases to \`../$HUB_REPO/docs/tests/e{N}-*.md\`
 $((step_num+2)). Add ready-to-test entry to \`../$HUB_REPO/docs/sessions/qa-session.md\`
 $((step_num+3)). Push
 EOF
+
+  cd "$repo_dir"
+  git init -q
+  git add CLAUDE.md
+  git commit -q -m "init: $PROJECT_NAME ${session^} repo"
+  cd - > /dev/null
 done
 
-# ── Init git ──────────────────────────────────────────────────────────────────
+# ── Init hub git ──────────────────────────────────────────────────────────────
 
 cd "$OUTPUT_DIR"
 git init -q
@@ -305,16 +312,20 @@ echo
 echo "$(bold 'Sessions generated:')"
 for s in "${SESSIONS[@]}"; do echo "  • $s-session.md"; done
 echo
-if [ -d "$CODE_CLAUDE_DIR" ] && [ "$(ls -A "$CODE_CLAUDE_DIR")" ]; then
-  echo "$(bold 'CLAUDE.md files for code repos:') $(dim '_code-repo-claudes/')"
-  for f in "$CODE_CLAUDE_DIR"/*.md; do
-    echo "  → copy $(basename "$f") to $(basename "$f" -CLAUDE.md)/CLAUDE.md"
+CODE_REPOS=()
+for s in "${SESSIONS[@]}"; do
+  case "$s" in planning|qa) continue ;; esac
+  CODE_REPOS+=("${REPOS[$s]}")
+done
+if [ ${#CODE_REPOS[@]} -gt 0 ]; then
+  echo "$(bold 'Code repos created (sibling directories):')"
+  for repo in "${CODE_REPOS[@]}"; do
+    echo "  • $PARENT_DIR/$repo/  (CLAUDE.md + git init)"
   done
   echo
 fi
 echo "$(bold 'Next steps:')"
 echo "  1. Replace placeholder URLs in docs/sessions/qa-session.md"
 echo "  2. Install BMad: run the BMad installer in $OUTPUT_DIR"
-echo "  3. Copy each file in _code-repo-claudes/ to its code repo as CLAUDE.md"
-echo "  4. Push to GitHub and enable 'Template repository' in repo settings"
-echo "  5. Start your first planning session: open Claude Code in $OUTPUT_DIR"
+echo "  3. Push each repo to GitHub"
+echo "  4. Start your first planning session: open Claude Code in $OUTPUT_DIR"

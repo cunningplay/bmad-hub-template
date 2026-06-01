@@ -103,22 +103,29 @@ See [examples/](examples/) for sample session files for each preset.
 ## What gets generated
 
 ```
-my-project-hub/
-├── CLAUDE.md                        ← auto-loaded by Claude Code; PM session context
-├── docs/
-│   ├── sessions/
-│   │   ├── planning-session.md      ← always created
-│   │   ├── qa-session.md            ← always created
-│   │   ├── backend-session.md       ← if backend selected
-│   │   ├── web-session.md           ← if web selected
-│   │   ├── ios-session.md           ← if ios selected
-│   │   ├── android-session.md       ← if android selected
-│   │   └── archive/                 ← completed sprint logs go here
-│   ├── epics/                       ← full story specs (written by PM session)
-│   └── tests/                       ← QA test cases per epic
-└── _code-repo-claudes/              ← drop each file into the matching code repo
-    └── my-project-api-CLAUDE.md     ← copy to my-project-api/CLAUDE.md
+(your working directory)/
+├── my-project-hub/                  ← hub repo, git initialised
+│   ├── CLAUDE.md                    ← auto-loaded by Claude Code; PM session context
+│   └── docs/
+│       ├── sessions/
+│       │   ├── planning-session.md  ← always created
+│       │   ├── qa-session.md        ← always created
+│       │   ├── backend-session.md   ← if backend selected
+│       │   ├── web-session.md       ← if web selected
+│       │   ├── ios-session.md       ← if ios selected
+│       │   ├── android-session.md   ← if android selected
+│       │   └── archive/
+│       ├── epics/
+│       └── tests/
+├── my-project-backend/              ← code repo, git initialised, ready to push
+│   └── CLAUDE.md
+├── my-project-web/
+│   └── CLAUDE.md
+└── my-project-ios/
+    └── CLAUDE.md
 ```
+
+Each code repo is created as a sibling of the hub — no copying required. Open each in Claude Code and it immediately has full session context.
 
 ## Adding sessions later
 
@@ -151,9 +158,17 @@ BMad is the AI-native development framework that powers the personas, skills, an
 
 > Install BMad **before** opening your first planning session. The PM persona (`bmad-agent-pm`) and all `/bmad-*` skills come from BMad, not from this template.
 
-### 2. Copy code repo CLAUDE.md files
+### 2. Push code repos to GitHub
 
-Drop each file from `_code-repo-claudes/` into the root of its code repo as `CLAUDE.md`. Claude Code reads this automatically on startup — no kickoff copy-paste needed.
+Each code repo was created as a sibling directory of the hub, already `git init`'d with an initial commit. Add a remote and push each one:
+
+```bash
+cd ../my-project-backend
+git remote add origin git@github.com:your-org/my-project-backend.git
+git push -u origin main
+```
+
+Claude Code reads `CLAUDE.md` automatically on startup — no copy-paste needed.
 
 ### 3. Update production URLs
 

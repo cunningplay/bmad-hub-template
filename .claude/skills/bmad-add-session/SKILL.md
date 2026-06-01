@@ -1,6 +1,6 @@
 ---
 name: bmad-add-session
-description: Add a new code session to an existing BMad project hub. Generates the session file, updates the hub CLAUDE.md session map, and produces a ready-to-copy CLAUDE.md for the new code repo. Use when the user says "add session", "add repo", "add backend", "add iOS", or similar.
+description: Add a new code session to an existing BMad project hub. Generates the session file, updates the hub CLAUDE.md session map, and creates a sibling repo directory with CLAUDE.md ready for git. Use when the user says "add session", "add repo", "add backend", "add iOS", or similar.
 ---
 
 # BMad Add Session Skill
@@ -14,7 +14,7 @@ Adds a new code session to an already-scaffolded BMad hub. Run this from inside 
 2. Asks which session type to add and what the repo is called
 3. Generates the session file in `docs/sessions/`
 4. Updates the session map in `CLAUDE.md` and `docs/sessions/README.md`
-5. Produces a `CLAUDE.md` for the new code repo (in `_code-repo-claudes/`)
+5. Creates a sibling repo directory with `CLAUDE.md` inside, ready to push to GitHub
 
 **Environment-aware:** detects Claude Code vs other interfaces and switches between direct file writing and guided copy-paste output.
 
@@ -139,9 +139,27 @@ Platform-specific workflow lines:
 6. Push
 ```
 
-**If MODE = direct:** write to `_code-repo-claudes/{repo-name}-CLAUDE.md` (create the directory if it doesn't exist).
+**If MODE = direct:** create the repo directory as a sibling of the hub (one level up from the hub root) and write `CLAUDE.md` into it:
+```
+(parent)/
+├── {hub-repo}/        ← you are here
+└── {repo-name}/       ← created now
+    └── CLAUDE.md
+```
+Then run `git init && git add CLAUDE.md && git commit -m "init: {project} {session} repo"` inside it.
 
-**If MODE = guided:** output as a labelled code block.
+**If MODE = guided:** output as a labelled code block showing the target path:
+````
+### `../{repo-name}/CLAUDE.md`
+```markdown
+{file contents}
+```
+````
+Then show the shell commands:
+```bash
+mkdir ../{repo-name} && cd ../{repo-name}
+git init && git add CLAUDE.md && git commit -m "init: {project} {session} repo"
+```
 
 </step>
 
@@ -193,20 +211,20 @@ The sessions README contains a table of all session files. Add a row for the new
 
 Files created / updated:
 - `docs/sessions/{type}-session.md` ✓
-- `_code-repo-claudes/{repo-name}-CLAUDE.md` ✓
+- `../{repo-name}/CLAUDE.md` ✓ (sibling directory, git initialised)
 - `CLAUDE.md` — session map updated ✓
 - `docs/sessions/README.md` — session table updated ✓
 
 **Next steps:**
-1. Copy `_code-repo-claudes/{repo-name}-CLAUDE.md` to `{repo-name}/CLAUDE.md` in the new code repo
-2. Commit both repos
+1. Push `../{repo-name}/` to GitHub as a new repo
+2. Commit the hub repo changes
 3. The PM session will populate `docs/sessions/{type}-session.md` with the first sprint tasks
 
 ---
 
 **If MODE = guided:**
 
-Summarise all outputs with copy instructions and the manual edit needed for `CLAUDE.md` and `docs/sessions/README.md`.
+Summarise all outputs and the manual edits needed for `CLAUDE.md` and `docs/sessions/README.md`.
 
 </step>
 

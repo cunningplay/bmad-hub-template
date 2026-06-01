@@ -249,18 +249,18 @@ All testing is against production URLs — never localhost.
 # .gitignore
 ".DS_Store`nThumbs.db`ndesktop.ini" | Set-Content "$OutputDir\.gitignore" -Encoding UTF8
 
-# ── Generate code repo CLAUDE.md files ───────────────────────────────────────
+# ── Generate code repo directories with CLAUDE.md ────────────────────────────
 
-$CodeClaudeDir = "$OutputDir\_code-repo-claudes"
-New-Item -ItemType Directory -Force $CodeClaudeDir | Out-Null
+$ParentDir = Split-Path -Parent (Resolve-Path $OutputDir -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Path 2>$null ?? (Join-Path (Get-Location) $OutputDir))
 
 foreach ($session in $Sessions) {
     if ($session -in @("planning", "qa")) { continue }
 
-    $repo  = $Repos[$session]
-    $role  = $RepoRoles[$session]
-    $lint  = if ($LintCmds[$session]) { $LintCmds[$session] } else { "run your stack's lint + test command" }
-    $title = (Get-Culture).TextInfo.ToTitleCase($session)
+    $repo     = $Repos[$session]
+    $role     = $RepoRoles[$session]
+    $lint     = if ($LintCmds[$session]) { $LintCmds[$session] } else { "run your stack's lint + test command" }
+    $title    = (Get-Culture).TextInfo.ToTitleCase($session)
+    $repoDir  = Join-Path $ParentDir $repo
 
     $persona = switch ($session) {
         "ios"     { "bmad-agent-dev - Swift / SwiftUI" }
@@ -273,6 +273,8 @@ foreach ($session in $Sessions) {
     } else { "" }
 
     $stepBase = if ($session -in @("ios", "android")) { 4 } else { 3 }
+
+    New-Item -ItemType Directory -Force $repoDir | Out-Null
 
     @"
 # $ProjectName — $title Session
@@ -297,10 +299,16 @@ $stepBase. ``$lint``
 $($stepBase + 1). Add QA test cases to ``../$HubRepo/docs/tests/e{N}-*.md``
 $($stepBase + 2). Add ready-to-test entry to ``../$HubRepo/docs/sessions/qa-session.md``
 $($stepBase + 3). Push
-"@ | Set-Content "$CodeClaudeDir\$repo-CLAUDE.md" -Encoding UTF8
+"@ | Set-Content "$repoDir\CLAUDE.md" -Encoding UTF8
+
+    Push-Location $repoDir
+    git init -q
+    git add "CLAUDE.md"
+    git commit -q -m "init: $ProjectName $title repo"
+    Pop-Location
 }
 
-# ── Init git ──────────────────────────────────────────────────────────────────
+# ── Init hub git ──────────────────────────────────────────────────────────────
 
 Push-Location $OutputDir
 git init -q
@@ -319,12 +327,12 @@ Write-Host "Sessions generated:" -ForegroundColor Cyan
 foreach ($s in $Sessions) { Write-Host "  - $s-session.md" }
 Write-Host ""
 
-$claudeFiles = Get-ChildItem "$CodeClaudeDir\*.md" -ErrorAction SilentlyContinue
-if ($claudeFiles) {
-    Write-Host "CLAUDE.md files for code repos: _code-repo-claudes\" -ForegroundColor Cyan
-    foreach ($f in $claudeFiles) {
-        $repoName = $f.Name -replace '-CLAUDE\.md$', ''
-        Write-Host "  -> copy $($f.Name) to $repoName\CLAUDE.md"
+$codeRepos = $Sessions | Where-Object { $_ -notin @("planning", "qa") }
+if ($codeRepos) {
+    Write-Host "Code repos created (sibling directories):" -ForegroundColor Cyan
+    foreach ($s in $codeRepos) {
+        $r = $Repos[$s]
+        Write-Host "  - $(Join-Path $ParentDir $r)\  (CLAUDE.md + git init)"
     }
     Write-Host ""
 }
@@ -332,6 +340,5 @@ if ($claudeFiles) {
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Replace placeholder URLs in docs\sessions\qa-session.md"
 Write-Host "  2. Install BMad: run the BMad installer in $OutputDir"
-Write-Host "  3. Copy each file in _code-repo-claudes\ to its code repo as CLAUDE.md"
-Write-Host "  4. Push to GitHub and enable 'Template repository' in repo settings"
-Write-Host "  5. Start your first planning session: open Claude Code in $OutputDir"
+Write-Host "  3. Push each repo to GitHub"
+Write-Host "  4. Start your first planning session: open Claude Code in $OutputDir"
