@@ -1,0 +1,28 @@
+# Customization surface for bmad-setup-hub.
+# Override these in _bmad/custom/bmad-setup-hub.toml (team) or
+# _bmad/custom/bmad-setup-hub.user.toml (personal).
+
+[workflow]
+
+# Steps to run before activation (pre-flight checks, compliance gates).
+activation_steps_prepend = []
+
+# Steps to run after greeting but before the workflow begins.
+activation_steps_append = []
+
+# Persistent facts carried for the whole workflow run.
+# Add org-level standards here, e.g.:
+#   "All repos must be in the github.com/acme org."
+#   "file:{project-root}/docs/naming-conventions.md"
+persistent_facts = []
+
+# Default architecture preset to pre-select (leave empty to always prompt).
+# Valid values: "web-only", "api-web", "api-mobile", "api-ios", "full-stack"
+default_preset = ""
+
+# Default output directory relative to cwd (leave empty to use hub repo name).
+default_output_dir = ""
+
+# Executed after the hub is generated and git is initialized.
+# Leave empty for no custom post-completion behavior.
+on_complete = ""

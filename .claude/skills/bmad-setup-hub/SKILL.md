@@ -1,0 +1,291 @@
+---
+name: bmad-setup-hub
+description: Scaffold a new BMad project hub interactively. Asks for project name, architecture preset, and repo names — then generates all session files, hub CLAUDE.md, and per-repo CLAUDE.md files. Use when the user says "setup hub", "new project", or "create hub".
+---
+
+# BMad Hub Setup Skill
+
+## Overview
+
+This workflow creates a complete BMad project hub from scratch. It asks questions conversationally, presents architecture presets, and then uses file tools to generate all session files, the hub `CLAUDE.md`, and ready-to-copy `CLAUDE.md` files for each code repo.
+
+No terminal, no script execution, no platform issues. Works identically on Mac, Linux, and Windows.
+
+## Conventions
+
+- Bare paths resolve from the skill root.
+- `{skill-root}` = this skill's installed directory.
+- `{project-root}` = the working directory of the current Claude Code session.
+- Template files live at `{skill-root}/../../templates/` (two levels up from the skill, at the repo root's `templates/` directory).
+
+## On Activation
+
+### Step 1: Resolve the Workflow Block
+
+Run: `python3 {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --key workflow`
+
+**If the script fails**, read `{skill-root}/customize.toml` and apply defaults directly. No team or user overrides are expected for this skill.
+
+### Step 2: Load Config (if BMad is installed)
+
+If `{project-root}/_bmad/bmm/config.yaml` exists, load it and use:
+- `{user_name}` for addressing the user
+- `{communication_language}` for all responses
+
+If the config doesn't exist (BMad not yet installed), use "there" as the fallback name and English as the language — this skill often runs *before* BMad is installed.
+
+### Step 3: Greet and Begin
+
+Greet the user and proceed immediately to the workflow. Do not show a menu.
+
+---
+
+## Workflow
+
+<workflow>
+
+<step n="1" goal="Collect project information">
+
+Ask the following questions in a single conversational message — do not ask one at a time:
+
+1. **Project name** — what is the product called? (e.g. "Ashenmarch")
+2. **One-line description** — what does it do?
+3. **Hub repo name** — what will the planning hub repo be called? (suggest: `{project-name}-hub` or `{ProjectName}_Hub`)
+
+Wait for the user's answers before proceeding.
+
+</step>
+
+<step n="2" goal="Choose architecture preset">
+
+Present the following options clearly:
+
+| # | Preset | Sessions created | Use when |
+|---|--------|-----------------|----------|
+| 1 | **Web only** | planning, web, qa | Frontend with serverless / third-party backend |
+| 2 | **API + Web** | planning, backend, web, qa | Separate API server + web frontend |
+| 3 | **API + iOS** | planning, backend, ios, qa | API + iOS native app only |
+| 4 | **API + Mobile** | planning, backend, ios, android, qa | API + native mobile (both platforms) |
+| 5 | **Full stack** | planning, backend, web, ios, android, qa | API + web companion + native mobile |
+| 6 | **Custom** | you choose | Any other combination |
+
+For **Custom**, ask the user to select from: `backend`, `web`, `ios`, `android`, `cli`. Allow multiple selections.
+
+Always include `planning` and `qa` — they are not optional.
+
+Wait for the user's choice before proceeding.
+
+</step>
+
+<step n="3" goal="Collect repo names and stack details">
+
+For each code session selected (not planning or qa), ask:
+
+- **Repo name** — what is the code repo called? (suggest a slug based on project name)
+- **Lint + test command** — what command validates the code? (for backend/web/cli only; skip for ios/android since those have fixed commands)
+
+Also ask:
+- **Admin/test email** — used in the QA session credentials table (e.g. `admin@example.com`)
+
+Group all questions for this step into one message to avoid excessive back-and-forth. Example:
+
+> For your backend repo:
+> - Repo name? [my-project-backend]
+> - Lint + test command? [go test ./... && golangci-lint run]
+>
+> For your web repo:
+> - Repo name? [my-project-web]
+> - Lint + test command? [npm run check]
+>
+> Admin test email? [admin@example.com]
+
+Wait for answers.
+
+</step>
+
+<step n="4" goal="Confirm and preview">
+
+Show a summary of what will be generated:
+
+```
+Hub repo:     {hub-repo-name}/
+Sessions:     planning, {selected-sessions}, qa
+Code repos:   {list of repo names}
+Output:       ./{hub-repo-name}/  (created in current directory)
+              ./{hub-repo-name}/_code-repo-claudes/  (CLAUDE.md per code repo)
+```
+
+Ask: **"Shall I generate this now?"**
+
+If the user wants changes, loop back to the relevant step. If confirmed, proceed.
+
+</step>
+
+<step n="5" goal="Generate hub directory and session files">
+
+Create the following directory structure using the Write tool:
+
+```
+{hub-repo-name}/
+├── CLAUDE.md
+├── .gitignore
+├── docs/
+│   ├── sessions/
+│   │   ├── planning-session.md      ← always
+│   │   ├── {session}-session.md     ← one per selected session
+│   │   ├── qa-session.md            ← always
+│   │   ├── README.md
+│   │   └── archive/
+│   │       └── .gitkeep
+│   ├── epics/
+│   │   └── README.md
+│   └── tests/
+│       └── README.md
+```
+
+**For each file**, read the corresponding template from `{skill-root}/../../templates/` and substitute:
+
+| Placeholder | Value |
+|-------------|-------|
+| `{{PROJECT_NAME}}` | Project name from step 1 |
+| `{{PROJECT_DESCRIPTION}}` | Description from step 1 |
+| `{{HUB_REPO}}` | Hub repo name from step 1 |
+| `{{DATE}}` | Today's date (YYYY-MM-DD) |
+| `{{ADMIN_EMAIL}}` | Admin email from step 3 |
+| `{{SESSION_MAP}}` | Generated markdown table (see below) |
+| `{{PRODUCTION_URLS}}` | Generated markdown rows (see below) |
+| `{{BACKEND_REPO}}`, `{{WEB_REPO}}`, `{{IOS_REPO}}`, `{{ANDROID_REPO}}`, `{{CLI_REPO}}` | Repo names from step 3 |
+| `{{LINT_TEST_CMD}}` | Lint+test command from step 3 (per session) |
+
+**Session map table** — always starts with planning row, ends with qa row, code sessions in between:
+```
+| Session | File | Repo |
+|---------|------|------|
+| Planning | `docs/sessions/planning-session.md` | `{hub-repo}` |
+| Backend  | `docs/sessions/backend-session.md`  | `{backend-repo}` |
+...
+| QA | `docs/sessions/qa-session.md` | cross-repo |
+```
+
+**Production URLs block** — one row per service with a live URL:
+```
+| API | `https://api.example.com` |
+| Web | `https://app.example.com` |
+```
+(Use placeholder URLs — user fills in real ones after setup.)
+
+**sessions/README.md** — generate directly (no template needed):
+```markdown
+# Session Work Queues
+One file per active Claude Code session. Each answers: "What should I be doing right now?"
+
+| File | Session | Repo |
+|------|---------|------|
+{rows for each session}
+
+PM session maintains all files. Sessions read their file at session start and signal changes via the backlog.
+```
+
+**docs/epics/README.md** and **docs/tests/README.md** — write verbatim:
+
+```markdown
+# Epics
+One file per epic: `e{N}-{slug}.md`
+Frontmatter: epic, title, milestone, status, stories_total, stories_done.
+```
+
+```markdown
+# Test Cases
+One file per epic, mirroring docs/epics/ naming. QA session writes test cases here.
+Always test against production URLs — never localhost.
+```
+
+**.gitignore**:
+```
+.DS_Store
+Thumbs.db
+desktop.ini
+```
+
+</step>
+
+<step n="6" goal="Generate code repo CLAUDE.md files">
+
+For each selected code session, generate a `CLAUDE.md` file using `{skill-root}/../../templates/code-repo-CLAUDE.md` as the base, substituting all placeholders.
+
+Write each file to:
+```
+{hub-repo-name}/_code-repo-claudes/{repo-name}-CLAUDE.md
+```
+
+Platform-specific workflow lines by session type:
+
+**ios:**
+```
+1. Read spec in `../{hub-repo}/docs/epics/e{N}-*.md`
+2. Invoke `/bmad-dev-story` with the story file path
+3. GPS / App Group stories require a **physical device** — simulator insufficient
+4. Add QA test cases to `../{hub-repo}/docs/tests/e{N}-*.md`
+5. Add ready-to-test entry to `../{hub-repo}/docs/sessions/qa-session.md`
+6. Push
+```
+
+**android:**
+```
+1. Read spec in `../{hub-repo}/docs/epics/e{N}-*.md`
+2. Invoke `/bmad-dev-story` with the story file path
+3. `./gradlew detekt && ./gradlew assembleDebug`
+4. GPS / foreground service stories require a **physical device**
+5. Add QA test cases to `../{hub-repo}/docs/tests/e{N}-*.md`
+6. Add ready-to-test entry to `../{hub-repo}/docs/sessions/qa-session.md`
+7. Push
+```
+
+**backend / web / cli:**
+```
+1. Read spec in `../{hub-repo}/docs/epics/e{N}-*.md`
+2. Invoke `/bmad-dev-story` with the story file path
+3. `{lint-test-command}`
+4. Add QA test cases to `../{hub-repo}/docs/tests/e{N}-*.md`
+5. Add ready-to-test entry to `../{hub-repo}/docs/sessions/qa-session.md`
+6. Push
+```
+
+</step>
+
+<step n="7" goal="Initialize git and report">
+
+Run:
+```bash
+git -C {hub-repo-name} init
+git -C {hub-repo-name} add -A
+git -C {hub-repo-name} commit -m "init: {project-name} hub (BMad session scaffold)"
+```
+
+Then report to the user:
+
+---
+
+**Hub created: `./{hub-repo-name}/`**
+
+Sessions generated:
+- `planning-session.md`
+- _(one line per selected session)_
+- `qa-session.md`
+
+CLAUDE.md files for your code repos are in `_code-repo-claudes/` — copy each one to the root of its code repo:
+
+| File | Copy to |
+|------|---------|
+| `{repo}-CLAUDE.md` | `{repo}/CLAUDE.md` |
+
+**Next steps:**
+1. Fill in real production URLs in `docs/sessions/qa-session.md`
+2. Install BMad in the hub: run the BMad installer in `./{hub-repo-name}/`
+3. Copy each file from `_code-repo-claudes/` to its code repo as `CLAUDE.md`
+4. Push to GitHub — enable "Template repository" in settings if this hub is a template
+5. Open Claude Code in `./{hub-repo-name}/` and invoke `bmad-agent-pm` to start planning
+
+</step>
+
+</workflow>
