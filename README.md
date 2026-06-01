@@ -8,17 +8,20 @@ The hub is a single planning repo that owns all docs, epics, stories, and sessio
 
 ## Quickstart
 
-### Option A — Claude Code skill (recommended)
+### Option A — BMad skill (recommended)
 
-Open Claude Code in any directory and run:
+Open Claude Code (or any Claude interface with BMad installed) and run:
 
 ```
-/cc-setup-hub
+/bmad-setup-hub
 ```
 
-Claude asks for your project name, architecture preset, and repo names, then generates all files directly — no terminal, no platform issues, works identically on Mac, Linux, and Windows.
+Claude asks for your project name, architecture preset, and repo names. The skill detects your environment automatically:
 
-The skill is in `.claude/skills/cc-setup-hub/`. Install it by copying that directory into your Claude Code skills folder, or via the BMad installer.
+- **Claude Code** — writes files directly to disk and inits git
+- **Other interfaces** (claude.ai, API, etc.) — outputs all file contents as formatted code blocks to copy, plus the shell commands to run
+
+The skill is in `.claude/skills/bmad-setup-hub/`. Install it by copying that directory into your Claude Code skills folder, or via the BMad installer.
 
 ### Option B — Script (no Claude required)
 
@@ -44,9 +47,14 @@ Both scripts ask the same questions and produce identical output to the skill.
 
 ## Skill compatibility
 
-> **Note:** The skills in this template (`.claude/skills/`) are currently **Claude Code only**. They use Claude Code's Write and Bash tools to generate files directly — they will not work in other Claude interfaces (claude.ai, API, etc.) or other AI coding tools.
->
-> BMad itself is platform-agnostic. If you're running BMad in a different environment, use the shell scripts (`setup.sh` / `setup.ps1`) instead.
+`bmad-setup-hub` is environment-aware — it detects whether file system tools are available and adapts:
+
+| Environment | Skill behaviour |
+|-------------|----------------|
+| Claude Code | Writes files to disk, inits git |
+| claude.ai / API / other | Outputs file contents as copy-paste blocks + shell commands |
+
+The shell scripts (`setup.sh` / `setup.ps1`) are an alternative if you prefer not to use the skill at all.
 
 ## Architecture presets
 

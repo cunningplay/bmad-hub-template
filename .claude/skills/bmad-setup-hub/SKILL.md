@@ -1,15 +1,22 @@
 ---
-name: cc-setup-hub
-description: Scaffold a new BMad project hub interactively using Claude Code file tools. Asks for project name, architecture preset, and repo names — then generates all session files, hub CLAUDE.md, and per-repo CLAUDE.md files. Use when the user says "setup hub", "new project", or "create hub". Requires Claude Code.
+name: bmad-setup-hub
+description: Scaffold a new BMad project hub interactively. Asks for project name, architecture preset, and repo names — then generates all session files, hub CLAUDE.md, and per-repo CLAUDE.md files. Adapts to the environment: direct file generation in Claude Code, guided text output elsewhere. Use when the user says "setup hub", "new project", or "create hub".
 ---
 
 # BMad Hub Setup Skill
 
 ## Overview
 
-This workflow creates a complete BMad project hub from scratch. It asks questions conversationally, presents architecture presets, and then uses file tools to generate all session files, the hub `CLAUDE.md`, and ready-to-copy `CLAUDE.md` files for each code repo.
+This workflow creates a complete BMad project hub from scratch. It asks questions conversationally, presents architecture presets, and then generates all session files, the hub `CLAUDE.md`, and ready-to-copy `CLAUDE.md` files for each code repo.
 
-No terminal, no script execution, no platform issues. Works identically on Mac, Linux, and Windows.
+**Environment-aware:** the skill detects what tools are available at startup and switches modes automatically:
+
+| Mode | When | Behaviour |
+|------|------|-----------|
+| **Direct** | Claude Code (Write + Bash tools available) | Writes files to disk, inits git, reports paths |
+| **Guided** | Any other environment (claude.ai, API, etc.) | Outputs all file contents as formatted code blocks to copy-paste, plus shell commands to run |
+
+The questions, presets, and output content are identical in both modes.
 
 ## Conventions
 
@@ -43,6 +50,22 @@ Greet the user and proceed immediately to the workflow. Do not show a menu.
 ## Workflow
 
 <workflow>
+
+<step n="0" goal="Detect environment and set mode">
+
+Attempt to run the following Bash command silently:
+
+```bash
+pwd
+```
+
+**If it succeeds:** you are in Claude Code (or an equivalent tool-enabled environment). Set `MODE = direct`. File generation will write to disk.
+
+**If it fails or the tool is unavailable:** you are in a non-Claude-Code environment (claude.ai, API, IDE plugin without Bash, etc.). Set `MODE = guided`. File generation will output formatted content for the user to copy.
+
+Do not report the mode to the user — just carry it forward. Proceed to step 1.
+
+</step>
 
 <step n="1" goal="Collect project information">
 
@@ -123,7 +146,7 @@ If the user wants changes, loop back to the relevant step. If confirmed, proceed
 
 <step n="5" goal="Generate hub directory and session files">
 
-Create the following directory structure using the Write tool:
+**If MODE = direct:** create the following directory structure using the Write tool:
 
 ```
 {hub-repo-name}/
@@ -207,16 +230,55 @@ Thumbs.db
 desktop.ini
 ```
 
+**If MODE = guided:** output every file as a clearly labelled code block instead of writing to disk. Use this structure:
+
+````
+### `{hub-repo-name}/CLAUDE.md`
+```markdown
+{file contents}
+```
+
+### `{hub-repo-name}/docs/sessions/planning-session.md`
+```markdown
+{file contents}
+```
+...and so on for every file.
+````
+
+After all file blocks, output the shell commands the user needs to run:
+
+```bash
+# Create the directory structure
+mkdir -p {hub-repo-name}/docs/sessions/archive
+mkdir -p {hub-repo-name}/docs/epics
+mkdir -p {hub-repo-name}/docs/tests
+touch {hub-repo-name}/docs/sessions/archive/.gitkeep
+
+# After saving the files above:
+cd {hub-repo-name}
+git init
+git add -A
+git commit -m "init: {project-name} hub (BMad session scaffold)"
+```
+
 </step>
 
 <step n="6" goal="Generate code repo CLAUDE.md files">
 
-For each selected code session, generate a `CLAUDE.md` file using `{skill-root}/../../templates/code-repo-CLAUDE.md` as the base, substituting all placeholders.
+For each selected code session, generate a `CLAUDE.md` using `{skill-root}/../../templates/code-repo-CLAUDE.md` as the base, substituting all placeholders.
 
-Write each file to:
+**If MODE = direct:** write each file to:
 ```
 {hub-repo-name}/_code-repo-claudes/{repo-name}-CLAUDE.md
 ```
+
+**If MODE = guided:** output each as a labelled code block:
+````
+### `_code-repo-claudes/{repo-name}-CLAUDE.md`
+```markdown
+{file contents}
+```
+````
 
 Platform-specific workflow lines by session type:
 
@@ -255,12 +317,14 @@ Platform-specific workflow lines by session type:
 
 <step n="7" goal="Initialize git and report">
 
-Run:
+**If MODE = direct:** run:
 ```bash
 git -C {hub-repo-name} init
 git -C {hub-repo-name} add -A
 git -C {hub-repo-name} commit -m "init: {project-name} hub (BMad session scaffold)"
 ```
+
+**If MODE = guided:** the git commands were already included in step 5's shell block. Skip the Bash call.
 
 Then report to the user:
 
