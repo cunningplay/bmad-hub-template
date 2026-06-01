@@ -3,32 +3,21 @@ session: planning
 repo: "{{HUB_REPO}}"
 persona: bmad-agent-pm
 last_story: ""
-last_updated: ""
+last_updated: "{{DATE}}"
 ---
 
 # Planning Session — Work Queue
 
 > This session owns `{{HUB_REPO}}`. All docs, epics, stories, architecture, and session files live here.
-> See also: `CLAUDE.md` for the session map and PM responsibilities.
+> See also: `CLAUDE.md` for the full session map and PM responsibilities.
 
 ## 🔴 Next PM Tasks
 
-<!-- Add PM tasks here as they arise. Format:
-| # | Task | What |
-|---|------|------|
-| 1 | Task name | Description |
--->
-
-_No tasks yet — add your first sprint here._
+_Add your first tasks here._
 
 ## 🟢 Ready to Start
 
-<!-- Document active sprints and their dependency maps here.
-Copy the pattern from the Ashenmarch planning-session.md for wave-based sprints. -->
-
-## 🏁 Completed Milestones
-
-<!-- Record milestones here as they land. -->
+_Document active sprints and dependency maps here._
 
 ## 🔁 Ongoing
 
@@ -38,7 +27,7 @@ Copy the pattern from the Ashenmarch planning-session.md for wave-based sprints.
 
 ## ⏳ Pending
 
-<!-- Items that need input before they can become tasks. -->
+_Items waiting on input before they can become tasks._
 
 ## Persona & Skills
 

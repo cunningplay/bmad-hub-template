@@ -3,7 +3,7 @@ session: backend
 repo: "{{BACKEND_REPO}}"
 persona: bmad-agent-dev
 last_story: ""
-last_updated: ""
+last_updated: "{{DATE}}"
 ---
 
 # Backend Session — Work Queue
@@ -13,32 +13,23 @@ last_updated: ""
 
 ## 🔴 Top Priority
 
-<!-- PM fills this in. Format:
-| Story | What |
-|-------|------|
-| **X.Y** | Description |
--->
-
-_No active stories — check with PM._
+_No active stories — PM will populate this._
 
 ## 🟡 Ready (unblocked)
-
-<!-- Stories ready to pick up, in order. -->
 
 ## ⏳ Blocked
 
 | Story | Blocked on |
 |-------|-----------|
-| | |
 
 ## Persona & Skills
 
-**Persona:** `bmad-agent-dev` — backend developer
+**Persona:** `bmad-agent-dev`
 
 **Story workflow:**
 1. Read spec in `docs/epics/e{N}-*.md`
 2. `/bmad-dev-story` with the story file path
-3. Run lint + tests (project-specific — update this line)
+3. `{{LINT_TEST_CMD}}` ← update for your stack
 4. Add QA test cases to `docs/tests/e{N}-*.md`
 5. Add ready-to-test entry to `docs/sessions/qa-session.md`
 6. Push

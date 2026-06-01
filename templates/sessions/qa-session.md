@@ -2,28 +2,21 @@
 session: qa
 persona: bmad-qa
 last_story: ""
-last_updated: ""
+last_updated: "{{DATE}}"
 ---
 
 # QA Session — Work Queue
 
 > **Start every session by reading this file.** PM session maintains it.
-> Test cases for all stories: `docs/tests/`
-> File bugs via backlog (repo: owning session)
+> Test cases: `docs/tests/` · File bugs via backlog (tag owning repo)
 
 ## 🔴 Ready to Test Now
 
-<!-- PM or code sessions add entries here when stories are done.
-| Feature | Test file | Notes |
-| --- | --- | --- |
-| Feature name | docs/tests/eN-*.md | Notes |
--->
-
-_Nothing ready to test yet._
+_Code sessions add entries here when stories are done._
 
 ## 🔑 Test Credentials
 
-| Account | Role | Auth method |
+| Account | Role | Auth |
 | --- | --- | --- |
 | `{{ADMIN_EMAIL}}` | admin | email/password — ask user |
 
@@ -31,17 +24,14 @@ _Nothing ready to test yet._
 
 | Service | URL |
 | --- | --- |
-| Backend API | `{{LIVE_API_URL}}` |
-| Web | `{{LIVE_WEB_URL}}` |
+{{PRODUCTION_URLS}}
 
-## 📋 QA Backlog — No Coverage Yet
+## 📋 Backlog — No Coverage Yet
 
-<!-- Add areas that need test files. -->
+_Add areas that need test files as the project grows._
 
 ## 🐛 How to File Bugs
 
-Add to backlog:
-- `repo`: owning session repo
 - `id`: next bug-NNN in sequence
 - `title`: prefixed `🐛 BUG-NNN:`
 - `description`: steps + expected vs actual + AC reference
