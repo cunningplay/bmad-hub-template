@@ -6,7 +6,7 @@ A scaffold for setting up a **BMad method project hub** — the central planning
 
 When you use Claude Code to build software, each terminal session starts with no memory of what you were doing. If you have multiple repos — a backend, a web frontend, an iOS app — you end up with no consistent way to hand off context between sessions, no shared definition of what's in progress, and no clear answer to "what should I work on next?"
 
-The BMad method solves this with a **hub repo**: a single planning repository that every session reads first. It contains work queues (session files) that tell each Claude session exactly what to do, what's blocked, and what's done. The PM session owns and maintains these files; code sessions consume them.
+This template solves this with a **hub repo**: a single planning repository that every session reads first. It contains work queues (session files) that tell each Claude session exactly what to do, what's blocked, and what's done. The PM session owns and maintains these files; code sessions consume them.
 
 ## How it works
 
