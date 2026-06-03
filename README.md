@@ -137,6 +137,20 @@ If your project grows a new code repo after initial setup, run `/bmad-add-sessio
 
 It adds the session file, updates the hub `CLAUDE.md` session map, and generates a `CLAUDE.md` for the new code repo.
 
+## PM workflow skills
+
+Five skills are included for the PM session's recurring workflows. All are project-agnostic and work with any hub structure.
+
+| Skill | When to use |
+|-------|-------------|
+| `/pm-status` | Start of every PM session — reads all session files, produces a cross-session status table with current sprint, top priority, and blockers |
+| `/pm-story` | "File a story for X" — updates epic frontmatter, appends story spec with Given/When/Then ACs, adds to session queue, commits |
+| `/pm-decision` | "Lock this decision" — records in planning session decisions log + persistent memory, commits |
+| `/pm-sync` | "Story X shipped" — marks complete, promotes next story, adds to QA queue, updates `last_story`/`last_updated`, commits |
+| `/pm-triage` | "Answer the questions" — reads all `❓ Questions for PM` sections, records answers in ✅ PM Answers tables, commits |
+
+These replace the most repetitive manual PM patterns. Start each PM session with `/pm-status` instead of reading all session files individually.
+
 ## Skill compatibility
 
 `bmad-setup-hub` and `bmad-add-session` are environment-aware — they detect whether file system tools are available and adapt:
