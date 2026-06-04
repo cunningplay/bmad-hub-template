@@ -284,7 +284,8 @@ For each selected code session, generate a `CLAUDE.md` using `{skill-root}/../..
 For each code repo:
 1. Create the directory at the same level as the hub
 2. Write `CLAUDE.md` into it
-3. Run `git init && git add CLAUDE.md && git commit -m "init: {project} {session} repo"`
+3. Copy all dev skills from `{skill-root}/../../.claude/skills/` into `{repo}/.claude/skills/` — specifically: `dev-start`, `dev-done`, `dev-pm-check`, `dev-ask-pm`, `dev-qa-done`
+4. Run `git init && git add . && git commit -m "init: {project} {session} repo"`
 
 **If MODE = guided:** output each as a labelled code block with the target path shown:
 ````
@@ -293,10 +294,12 @@ For each code repo:
 {file contents}
 ```
 ````
-Then list the shell commands to create and init each repo:
+Then list the shell commands to create, add skills, and init each repo:
 ```bash
 mkdir {repo-name} && cd {repo-name}
-git init && git add CLAUDE.md && git commit -m "init: {project} {session} repo"
+# Copy dev skills from hub template
+cp -r path/to/bmad-hub-template/.claude/skills/dev-* .claude/skills/
+git init && git add . && git commit -m "init: {project} {session} repo"
 ```
 
 Platform-specific workflow lines by session type:

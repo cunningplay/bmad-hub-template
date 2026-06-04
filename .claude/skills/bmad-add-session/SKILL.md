@@ -146,7 +146,9 @@ Platform-specific workflow lines:
 └── {repo-name}/       ← created now
     └── CLAUDE.md
 ```
-Then run `git init && git add CLAUDE.md && git commit -m "init: {project} {session} repo"` inside it.
+Then:
+1. Copy dev skills from `{skill-root}/../../.claude/skills/` → `{repo-name}/.claude/skills/`: `dev-start`, `dev-done`, `dev-pm-check`, `dev-ask-pm`, `dev-qa-done`
+2. Run `git init && git add . && git commit -m "init: {project} {session} repo"` inside it.
 
 **If MODE = guided:** output as a labelled code block showing the target path:
 ````
@@ -158,7 +160,9 @@ Then run `git init && git add CLAUDE.md && git commit -m "init: {project} {sessi
 Then show the shell commands:
 ```bash
 mkdir ../{repo-name} && cd ../{repo-name}
-git init && git add CLAUDE.md && git commit -m "init: {project} {session} repo"
+# Copy dev skills from hub template
+cp -r path/to/bmad-hub-template/.claude/skills/dev-* .claude/skills/
+git init && git add . && git commit -m "init: {project} {session} repo"
 ```
 
 </step>
