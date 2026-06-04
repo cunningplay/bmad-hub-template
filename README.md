@@ -106,6 +106,9 @@ See [examples/](examples/) for sample session files for each preset.
 (your working directory)/
 ├── my-project-hub/                  ← hub repo, git initialised
 │   ├── CLAUDE.md                    ← auto-loaded by Claude Code; PM session context
+│   ├── .claude/skills/              ← PM + QA skills (run from the hub)
+│   │   ├── pm-status/  pm-story/  pm-decision/  pm-sync/  pm-triage/
+│   │   └── qa-start/   qa-pass/   qa-bug/        qa-fail/
 │   └── docs/
 │       ├── sessions/
 │       │   ├── planning-session.md  ← always created
@@ -118,14 +121,18 @@ See [examples/](examples/) for sample session files for each preset.
 │       ├── epics/
 │       └── tests/
 ├── my-project-backend/              ← code repo, git initialised, ready to push
-│   └── CLAUDE.md
+│   ├── CLAUDE.md
+│   └── .claude/skills/              ← dev skills (run from each code repo)
+│       ├── dev-start/  dev-done/  dev-pm-check/  dev-ask-pm/  dev-qa-done/
 ├── my-project-web/
-│   └── CLAUDE.md
+│   ├── CLAUDE.md
+│   └── .claude/skills/  (same 5 dev skills)
 └── my-project-ios/
-    └── CLAUDE.md
+    ├── CLAUDE.md
+    └── .claude/skills/  (same 5 dev skills)
 ```
 
-Each code repo is created as a sibling of the hub — no copying required. Open each in Claude Code and it immediately has full session context.
+Each code repo is created as a sibling of the hub — no copying required. Open each in Claude Code and it immediately has full session context and all its skills loaded.
 
 ## Adding sessions later
 
@@ -137,19 +144,52 @@ If your project grows a new code repo after initial setup, run `/bmad-add-sessio
 
 It adds the session file, updates the hub `CLAUDE.md` session map, and generates a `CLAUDE.md` for the new code repo.
 
-## PM workflow skills
+## Skills
 
-Five skills are included for the PM session's recurring workflows. All are project-agnostic and work with any hub structure.
+All skills are project-agnostic and require no user input for standard operations. They read and write hub session files, epic frontmatter, and QA queues automatically.
+
+### PM skills — installed in the hub
+
+Run from the hub repo (planning session).
 
 | Skill | When to use |
 |-------|-------------|
-| `/pm-status` | Start of every PM session — reads all session files, produces a cross-session status table with current sprint, top priority, and blockers |
-| `/pm-story` | "File a story for X" — updates epic frontmatter, appends story spec with Given/When/Then ACs, adds to session queue, commits |
-| `/pm-decision` | "Lock this decision" — records in planning session decisions log + persistent memory, commits |
-| `/pm-sync` | "Story X shipped" — marks complete, promotes next story, adds to QA queue, updates `last_story`/`last_updated`, commits |
-| `/pm-triage` | "Answer the questions" — reads all `❓ Questions for PM` sections, records answers in ✅ PM Answers tables, commits |
+| `/pm-status` | Start of every PM session — cross-session status table: sprint, top priority, blockers |
+| `/pm-story` | "File a story" — updates epic frontmatter, appends ACs, adds to session queue, commits |
+| `/pm-decision` | "Lock this decision" — records in planning session log + memory, commits |
+| `/pm-sync` | "Story X shipped" — marks complete, promotes next, adds to QA queue, commits |
+| `/pm-triage` | "Answer the questions" — reads ❓ Questions for PM, records answers, commits |
 
-These replace the most repetitive manual PM patterns. Start each PM session with `/pm-status` instead of reading all session files individually.
+### Dev skills — installed in every code repo
+
+Run from each code repo (backend, web, iOS, Android sessions).
+
+| Skill | When to use |
+|-------|-------------|
+| `/dev-start` | Start of session — picks top unblocked story, loads spec, begins `/bmad-dev-story` |
+| `/dev-done` | Story complete — marks epic done (with commit URL), updates session, notifies QA, commits hub |
+| `/dev-pm-check` | Check for new PM decisions/answers/sprint changes since last session |
+| `/dev-ask-pm` | "Ask PM" — appends to ❓ Questions for PM, commits hub, PM picks up on `/pm-triage` |
+| `/dev-qa-done` | "Notify QA" — adds story to QA ready-to-test table with AC summary, commits hub |
+
+### QA skills — installed in the hub
+
+QA is cross-repo — runs from the hub. Skills installed alongside PM skills.
+
+| Skill | When to use |
+|-------|-------------|
+| `/qa-start` | Pick up next ready-to-test story, load ACs, begin testing against production |
+| `/qa-pass` | All test cases passed — marks verified in qa-session.md, commits |
+| `/qa-bug` | File a bug — auto-increments BUG-NNN, formats report, commits hub |
+| `/qa-fail` | Story failed — links bug, marks failed in qa-session.md, flags dev session, commits |
+
+**Autonomous session flow:**
+
+```
+PM:  /pm-status → /pm-triage → /pm-story → /pm-sync
+Dev: /dev-pm-check → /dev-start → implement → /dev-done
+QA:  /qa-start → /qa-pass  (or  /qa-bug → /qa-fail)
+```
 
 ## Skill compatibility
 
